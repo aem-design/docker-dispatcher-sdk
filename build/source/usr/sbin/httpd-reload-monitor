@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+if [ -z "${RELOAD_TRIGGER}" ]; then
+  RELOAD_TRIGGER="reload"
+else
+  echo "Detected reload trigger file name: ${RELOAD_TRIGGER}"
+fi
+
+RELOAD_TRIGGER_FILE="${APACHE_PREFIX}/${RELOAD_TRIGGER}"
+
+echo "$(date) Monitoring reload trigger file existence at ${RELOAD_TRIGGER_FILE} seconds started"
+
+while inotifywait -e create ${APACHE_PREFIX} --include ${RELOAD_TRIGGER}
+do
+	if [[ -f ${RELOAD_TRIGGER_FILE} ]]; then
+		/usr/sbin/httpd-reload	
+	fi
+done

@@ -1,0 +1,26 @@
+version: "3"
+services:
+  dispatcher:
+    build: .
+    container_name: test_dispatcher
+    environment:
+      - AEM_PORT=8081
+      - AEM_HOST=host.docker.internal
+    volumes:
+        - ./src:/mnt/dev/src
+    ports:
+      - 8080:80
+    links:
+      - nginx
+    networks:
+      - backend
+  nginx:
+    image: aemdesign/nginx
+    container_name: test_dispatcher_renderer
+    ports:
+      - 8081:80
+    networks:
+      - backend
+networks:
+  backend:
+    driver: "bridge"

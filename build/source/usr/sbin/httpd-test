@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+# Pick up any necessary environment variables
+if [ -f /usr/sbin/envvars ]; then
+  . /usr/sbin/envvars
+fi
+
+# Pass the environment type as define
+DEFINE_ENV=`echo $ENVIRONMENT_TYPE | tr [:lower:] [:upper:]`
+
+exec su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${APACHE_PREFIX} -f ${APACHE_PREFIX}/conf/httpd.conf -DENVIRONMENT_${DEFINE_ENV} -t -D DUMP_RUN_CFG -D DUMP_ANY
