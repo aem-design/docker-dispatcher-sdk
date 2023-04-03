@@ -153,7 +153,9 @@ test_docker_run_usage() {
 # setup
 printLine "TEST CONFIGS"
 
-curl  "http://${LOCAL_IP}:${DISPATCHER_PORT}/"
+docker ps
+
+curl "http://0.0.0.0:${DISPATCHER_PORT}/"
 
 test_docker_run_usage ${DISPATCHER_PORT}
 
