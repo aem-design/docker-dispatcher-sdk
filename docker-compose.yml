@@ -5,7 +5,7 @@ services:
     container_name: test_dispatcher
     environment:
       - AEM_PORT=80
-      - AEM_HOST=test_dispatcher_renderer
+      - AEM_HOST=nginx
     volumes:
         - ./src:/mnt/dev/src
     ports:
