@@ -1,7 +1,7 @@
 FROM  alpine:latest
 
 LABEL   maintainer="devops <devops@aem.design>" \
-        version="4.3.3" \
+        version="2.0.169" \
         imagename="dispatcher-sdk" \
         test.command=" httpd -v | awk 'NR==1 {print $3}' | awk -F /  'NR==1 {print $2}'" \
         test.command.verify="2.4.6"
