@@ -135,7 +135,7 @@ test_docker_run_usage() {
 
   printLine "Requesting page from container"
 
-	OUTPUT=$(sleep 5 && curl -s "http://${LOCAL_IP}:${TEST_PORT}${PATH_TO_CHECK}")
+	OUTPUT=$(sleep 5 && curl -s "http://0.0.0.0:${TEST_PORT}${PATH_TO_CHECK}")
 
   echo ${OUTPUT}
 
