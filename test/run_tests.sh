@@ -137,6 +137,8 @@ test_docker_run_usage() {
 
 	OUTPUT=$(sleep 5 && curl -s "http://${LOCAL_IP}:${TEST_PORT}${PATH_TO_CHECK}")
 
+  echo ${OUTPUT}
+
 	if [[ "$OUTPUT" != *"$CHECK"* ]]; then
 	    printResult "error"
 	    printDebug "Image '${IMAGE_NAME}' test FAILED could not find ${CHECK} in output" "${OUTPUT}"
@@ -150,6 +152,8 @@ test_docker_run_usage() {
 
 # setup
 printLine "TEST CONFIGS"
+
+curl  "http://${LOCAL_IP}:${DISPATCHER_PORT}/"
 
 test_docker_run_usage ${DISPATCHER_PORT}
 
