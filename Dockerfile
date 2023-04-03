@@ -52,7 +52,11 @@ RUN   cd ${APACHE_PREFIX} && \
       chown -R -L ${APACHE_USER}:${APACHE_GROUP} ${APACHE_SERVER_ROOT}/modules  && \
       chown -R -L ${APACHE_USER}:${APACHE_GROUP} ${APACHE_RUN_DIR} && \
       chmod +x /docker_entrypoint.sh && \
-      chmod +x /usr/local/bin/validator
+      chmod +x /usr/local/bin/validator && \
+      chmod +x /usr/sbin/httpd-foreground && \
+      chmod +x /usr/sbin/httpd-reload && \
+      chmod +x /usr/sbin/httpd-reload-monitor && \
+      chmod +x /usr/sbin/httpd-test
 
 # add symlinks for default vhost and farm
 RUN   cd ${APACHE_PREFIX}/conf.d/enabled_vhosts  && \
