@@ -31,9 +31,10 @@ jobs:
       - name: build and test docker image
         run: |
           docker build --pull -t $IMAGE:$IMAGE_VERSION .
-          source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_container_verify.sh)
-          (bash test/run_tests.sh "$IMAGE:$IMAGE_VERSION")
           docker images
+          docker-compose up -d
+          bash ./test/run_tests.sh "$IMAGE:$IMAGE_VERSION"
+          docker-compose down
 
       - name: login to docker registry
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${DOCKER_REGISTRY} -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin

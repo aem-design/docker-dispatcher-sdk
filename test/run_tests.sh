@@ -148,7 +148,7 @@ test_docker_run_usage() {
 
 }
 
-setup
+# setup
 printLine "TEST CONFIGS"
 
 test_docker_run_usage ${DISPATCHER_PORT}
@@ -156,4 +156,4 @@ test_docker_run_usage ${DISPATCHER_PORT}
 printLine "SHOW LOGS"
 showlog
 
-teardown
+# teardown
