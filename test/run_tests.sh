@@ -18,6 +18,14 @@ else
     LOCAL_IP=$($IP route | awk '/default/ { print $3 }')
 fi
 
+echo "Testing image ${IMAGE_NAME} ..."
+echo "Local IP: ${LOCAL_IP}"
+echo "Renderer Port: ${RENDERER_PORT}"
+echo "Dispatcher Port: ${DISPATCHER_PORT}"
+echo "Dispatcher Log Level: ${DISPATCHER_LOGLEVEL}"
+echo "Debug: ${FLAG_DEBUG}"
+# output current path
+echo "Current Path: $(pwd)"
 
 
 #debug(message,type[error,info,warning],newlinesiffix)
