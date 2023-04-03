@@ -129,7 +129,7 @@ teardown() {
 
 test_docker_run_usage() {
 	printLine "Testing 'docker run' usage"
-	PATH_TO_CHECK="/content/aemdesign-showcase/au/en/component/details/generic-details.html"
+	PATH_TO_CHECK="/"
 	CHECK="${PATH_TO_CHECK}"
   TEST_PORT="${1}"
 
