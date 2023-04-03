@@ -130,12 +130,12 @@ teardown() {
 test_docker_run_usage() {
 	printLine "Testing 'docker run' usage"
 	PATH_TO_CHECK="/"
-	CHECK="${PATH_TO_CHECK}"
+	CHECK="NGINX Logo"
   TEST_PORT="${1}"
 
   printLine "Requesting page from container"
 
-	OUTPUT=$(sleep 5 && curl -s "http://0.0.0.0:${TEST_PORT}${PATH_TO_CHECK}")
+	OUTPUT=$(sleep 5 && curl -s "http://${LOCAL_IP}:${TEST_PORT}${PATH_TO_CHECK}")
 
 	if [[ "$OUTPUT" != *"$CHECK"* ]]; then
 	    printResult "error"
