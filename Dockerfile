@@ -51,7 +51,8 @@ RUN   cd ${APACHE_PREFIX} && \
       chown -R -L ${APACHE_USER}:${APACHE_GROUP} /var/log  && \
       chown -R -L ${APACHE_USER}:${APACHE_GROUP} ${APACHE_SERVER_ROOT}/modules  && \
       chown -R -L ${APACHE_USER}:${APACHE_GROUP} ${APACHE_RUN_DIR} && \
-      chmod +x /docker_entrypoint.sh
+      chmod +x /docker_entrypoint.sh && \
+      chmod +x /usr/local/bin/validator
 
 # add symlinks for default vhost and farm
 RUN   cd ${APACHE_PREFIX}/conf.d/enabled_vhosts  && \
