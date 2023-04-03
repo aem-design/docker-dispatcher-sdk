@@ -42,19 +42,19 @@ jobs:
       - name: push image version
         run: docker push $IMAGE:$IMAGE_VERSION
 
-      - name: push latest image on master
-        if: github.ref == 'refs/heads/master'
+      - name: push latest image on main
+        if: github.ref == 'refs/heads/main'
         run: |
           docker tag $IMAGE:$IMAGE_VERSION $IMAGE:latest
           docker push $IMAGE:latest
 
-      - name: update registry description with readme on master
-        if: github.ref == 'refs/heads/master'
+      - name: update registry description with readme on main
+        if: github.ref == 'refs/heads/main'
         run: |
           docker run --rm -v $(pwd):/data/ aemdesign/dockerhub-description "$DOCKER_USERNAME" "$DOCKER_PASSWORD" "$IMAGE"
 
       - uses: meeDamian/github-release@1.0
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.GITHUB_TAG }}
