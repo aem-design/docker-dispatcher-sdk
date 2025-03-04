@@ -9,11 +9,12 @@ fi
 
 RELOAD_TRIGGER_FILE="${APACHE_PREFIX}/${RELOAD_TRIGGER}"
 
-echo "$(date) Monitoring reload trigger file existence at ${RELOAD_TRIGGER_FILE} seconds started"
+echo "$(date) Monitoring reload trigger file existence at ${RELOAD_TRIGGER_FILE} started"
 
 while inotifywait -e create ${APACHE_PREFIX} --include ${RELOAD_TRIGGER}
 do
 	if [[ -f ${RELOAD_TRIGGER_FILE} ]]; then
-		/usr/sbin/httpd-reload	
+		/usr/sbin/httpd-reload
+		rm -f ${RELOAD_TRIGGER_FILE}
 	fi
 done

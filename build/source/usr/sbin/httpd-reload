@@ -7,13 +7,14 @@ PID_FILE="${APACHE_RUN_DIR}/httpd.pid"
 
 echo "$(date) Running /docker_entrypoint.d/20-create-docroots.sh"
 . /docker_entrypoint.d/20-create-docroots.sh
+echo "$(date) Running /docker_entrypoint.d/35-update-managed-rewrite-maps"
+. /docker_entrypoint.d/35-update-managed-rewrite-maps.sh
 echo "$(date) Reloading httpd config via sending signal to httpd initiated"
 if [[ -f ${PID_FILE} ]]
 then
   echo "$(date) Using httpd PID from ${PID_FILE}"
   kill -USR1 $(cat ${PID_FILE})
   echo "$(date) Signal to reload httpd config sent" 
-  rm -f ${RELOAD_TRIGGER_FILE}
 else
   echo "$(date) No httpd PID file found at ${PID_FILE}"
 fi

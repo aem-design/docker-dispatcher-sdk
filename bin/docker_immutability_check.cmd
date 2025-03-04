@@ -15,6 +15,9 @@ if "%argC%" neq "1" (
         echo %0 src check
         echo # Use config folder ^"src^" as a destination to extract immutable files into it
         echo %0 src extract
+        echo Environment variables available:
+        echo IMMUTABLE_FILES_UPDATE:     controls whether immutable files should be updated or not.
+        echo                             Valid values are true or false (default is true^)
         exit /B 2
     )
 )
@@ -46,7 +49,7 @@ if not exist %folder%\* (
 rem Verify docker file is available
 set repo=adobe
 set image=aem-cs/dispatcher-publish
-set version=2.0.169
+set version=2.0.235
 set "imageurl=%repo%/%image%:%version%"
 
 for /F "tokens=* USEBACKQ" %%f in (`docker images -q %imageurl%`) do (
@@ -80,3 +83,27 @@ docker run --rm ^
     -v %folder%:/etc/httpd-actual:!configVolumeMountMode! ^
     -v ^"%scriptDir%..\lib\immutability_check.sh:/usr/sbin/immutability_check.sh:ro^" ^
     --entrypoint /bin/sh %imageurl% /usr/sbin/immutability_check.sh /etc/httpd/immutable.files.txt /etc/httpd-actual !mode!
+
+set exitcode=!ERRORLEVEL!
+
+if !exitcode! neq 0 (
+    if "!IMMUTABLE_FILES_UPDATE!" == "false" (
+        echo ** info: Immutable files were changed.
+        exit /B %exitcode%
+    )
+
+    :start
+    set /p answer="Do you want to update immutable files? (yes/no): "
+    if /I "!answer!" == "yes" (
+        %scriptDir%/update_maven.cmd %folder%
+        echo ** info: User is advised to re-run the validation of immutable files again.
+        exit /B 0
+    )
+    if /I "!answer!" == "no" (
+        exit /B 0
+    )
+    echo ** info: Please answer yes or no.
+    goto :start
+) else (
+    exit /B 0
+)

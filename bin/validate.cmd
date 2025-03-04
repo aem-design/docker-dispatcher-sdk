@@ -55,6 +55,18 @@ if exist %configDir%\opt-in\USE_SOURCES_DIRECTLY (
 
     echo Phase 3 finished
 
+    if [%ENABLE_VALIDATOR_CHECK_FLAG%] equ [true] (
+        echo Phase 4: Endpoints check
+        set sdkDir=!scriptDir!..\
+        call !scriptDir!validator check -configFolder !configDir! -sdkFolder !sdkDir!
+
+        if !ERRORLEVEL! NEQ 0 (
+            echo Phase 4 failed
+            exit /B !ERRORLEVEL!
+        )
+
+        echo Phase 4 finished
+    )
 ) else (
     echo WARNING: legacy mode was detected. Please plan to move to flexible mode and benefit from all the new features. More details here https://experienceleague.adobe.com/docs/experience-manager-cloud-service/content/implementing/content-delivery/validation-debug.html?lang=en#migrating
     set randomSubstring=!RANDOM!
@@ -77,6 +89,7 @@ if exist %configDir%\opt-in\USE_SOURCES_DIRECTLY (
     echo Phase 1 finished
 
     echo Phase 2: httpd -t validation in docker image
+    set HTTPD_DUMP_VHOSTS=true
     call !scriptDir!docker_run.cmd !tempDir! localhost:12345 test
 
     if !ERRORLEVEL! NEQ 0 (

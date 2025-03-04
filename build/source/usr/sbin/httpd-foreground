@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+source httpd-arguments
 
 # Apache gets grumpy about PID files pre-existing
 rm -f ${APACHE_RUN_DIR}/httpd.pid
@@ -11,40 +12,15 @@ fi
 
 /usr/sbin/httpd-reload-monitor &
 
+if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+  /usr/sbin/managed-rewrite-maps-update-loop &
+fi
+
 # Pass the environment type as define
 DEFINE_ENV=`echo $ENVIRONMENT_TYPE | tr [:lower:] [:upper:]`
-ARGS="-DFOREGROUND -DENVIRONMENT_${DEFINE_ENV}"
+ARGS="-DENVIRONMENT_${DEFINE_ENV}"
 
-if [ -n "${COMMERCE_ENDPOINT}" ]; then
-  echo "Enabling reverse-proxy for Commerce - COMMERCE_ENDPOINT=${COMMERCE_ENDPOINT}"
-  ARGS="${ARGS} -DCOMMERCE"
-fi
-if [ -n "${AEM_COMMERCE_ENDPOINT_2}" ]; then
-  echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_2=${AEM_COMMERCE_ENDPOINT_2}"
-  ARGS="${ARGS} -DCOMMERCE_ENDPOINT_2"
-fi
-if [ -n "${AEM_COMMERCE_ENDPOINT_3}" ]; then
-  echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_3=${AEM_COMMERCE_ENDPOINT_3}"
-  ARGS="${ARGS} -DCOMMERCE_ENDPOINT_3"
-fi
-if [ -n "${AEM_COMMERCE_ENDPOINT_4}" ]; then
-  echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_4=${AEM_COMMERCE_ENDPOINT_4}"
-  ARGS="${ARGS} -DCOMMERCE_ENDPOINT_4"
-fi
-if [ -n "${AEM_COMMERCE_ENDPOINT_5}" ]; then
-  echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_5=${AEM_COMMERCE_ENDPOINT_5}"
-  ARGS="${ARGS} -DCOMMERCE_ENDPOINT_5"
-fi
-
-if [ -n "${AEM_HTTP_PROXY_HOST}" ]; then
-  echo "Enabling HTTP egress proxy - AEM_HTTP_PROXY_HOST=${AEM_HTTP_PROXY_HOST}"
-  ARGS="${ARGS} -DHTTP_EGRESS_PROXY"
-fi
-
-if [ -n "${FRONTEND_URI_PREFIX}" ]; then
-  echo "Enabling fronted support"
-  ARGS="${ARGS} -DFRONTEND_SUPPORT"
-fi
+cleanup_arguments
 
 echo "Starting httpd server"
-exec su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${APACHE_PREFIX} -f ${APACHE_PREFIX}/conf/httpd.conf ${ARGS}
+exec su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${APACHE_PREFIX} -f ${APACHE_PREFIX}/conf/httpd.conf -DFOREGROUND ${ARGS}

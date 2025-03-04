@@ -42,6 +42,12 @@ if "%argC%" neq "3" (
     echo                    Valid values are paths to files. (e.g. my_envs.env^) (default is not set^)
     echo ALLOW_CACHE_INVALIDATION_GLOBALLY: specifies if the default_invalidate.any file for cache should be overwritten to allow all connections
     echo                                    Valid values: true/false (default is false^)
+    echo HTTPD_DUMP_VHOSTS: enable dump of vhosts for debug
+    echo                    Valid values are true/false (default is false^)
+    echo ENABLE_MANAGED_REWRITE_MAPS_FLAG: enable managed rewrite maps
+    echo                                   Valid values are true/false (default is true^)
+    echo MANAGED_REWRITE_MAPS_PROBE_CHECK_SKIP: skip probe check for managed rewrite maps
+    echo                                        Valid values are true/false (default is false^)
     exit /B 2
 )
 
@@ -175,12 +181,22 @@ if [%ENV_FILE%] neq [] (
     set envvars=%envvars% --env-file %ENV_FILE%
 )
 
+if [%ENABLE_MANAGED_REWRITE_MAPS_FLAG%] equ [] (
+    rem Managed rewrite maps enabled by default
+    set ENABLE_MANAGED_REWRITE_MAPS_FLAG=true
+)
+set envvars=%envvars% --env ENABLE_MANAGED_REWRITE_MAPS_FLAG=%ENABLE_MANAGED_REWRITE_MAPS_FLAG%
+
+if [%MANAGED_REWRITE_MAPS_PROBE_CHECK_SKIP%] neq [] (
+    set envvars=%envvars% --env MANAGED_REWRITE_MAPS_PROBE_CHECK_SKIP=%MANAGED_REWRITE_MAPS_PROBE_CHECK_SKIP%
+)
+
 :check_finished
 
 rem Verify docker file is available
 set repo=adobe
 set image=aem-cs/dispatcher-publish
-set version=2.0.169
+set version=2.0.235
 set "imageurl=%repo%/%image%:%version%"
 
 for /F "tokens=* USEBACKQ" %%f in (`docker images -q %imageurl%`) do (
@@ -204,7 +220,14 @@ if [%location%] equ [] (
 
 rem Run docker
 if [%localport%] equ [test] (
-    docker run --rm %volumes% %envvars% --env SKIP_CONFIG_TESTING=true %imageurl% /usr/sbin/httpd-test
+    docker run --rm %volumes% %envvars% --env SKIP_BACKEND_WAIT=true --env SKIP_CONFIG_TESTING=true %imageurl% /usr/sbin/httpd-test
+    if "!HTTPD_DUMP_VHOSTS!" == "true" (
+        docker run --rm --entrypoint test %imageurl% -f /usr/sbin/httpd-vhosts
+        if !ERRORLEVEL! NEQ 0 (
+            set volumes=-v ^"%scriptDir%..\lib\httpd-vhosts:/usr/sbin/httpd-vhosts:ro^" !volumes!
+        )
+        docker run --rm !volumes! %envvars% --env SKIP_BACKEND_WAIT=true --env SKIP_CONFIG_TESTING=true %imageurl% /usr/sbin/httpd-vhosts
+    )
 ) else (
     docker run --rm -p %localport%:80 %volumes% %envvars% %imageurl%
 )

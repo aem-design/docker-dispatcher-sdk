@@ -79,7 +79,7 @@ function build_configuration {
   fi
 
   log_debug "Copying customer configuration..."
-  for relativeSubfolder in "conf.d" "conf.dispatcher.d"
+  for relativeSubfolder in "conf.d" "conf.dispatcher.d" "opt-in"
   do
       log_debug "processing configuration subfolder: $relativeSubfolder"
       subfolder="${CUSTOMER_CONF}/${relativeSubfolder}"
@@ -163,10 +163,13 @@ function test_configuration {
         fi
     fi
 
-    # Test user configuration with httpd -t
+    source /usr/sbin/httpd-arguments
+    cleanup_arguments
 
-    DEFINE_ENV=$(echo "${ENVIRONMENT_TYPE}" | tr "[:lower:]" "[:upper:]")
-    
+    if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+      /usr/sbin/managed-rewrite-maps-empty-init "${target}"
+    fi
+
     log_info "Testing with fresh base configuration files."
     if [ -z "${LOG_APACHE_INFO}" ]
     then
@@ -175,14 +178,14 @@ function test_configuration {
         echo " "
         su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -V -S -d ${target} -f ${target}/conf/httpd.conf
         echo " "
-        echo su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd  -d ${target} -f ${target}/conf/httpd.conf -DENVIRONMENT_"${DEFINE_ENV}" -t ${DUMP_CONFIG_INFO}
+        echo su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd  -d ${target} -f ${target}/conf/httpd.conf ${ARGS} -t ${DUMP_CONFIG_INFO}
         echo " "
         echo " "
     fi
 
     sed -i "s#ServerRoot [\"]/etc/httpd[\"]#ServerRoot \"${target}\"#" "${target}/conf/httpd.conf"
 
-    APACHE_PREFIX=${target} su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${target} -f ${target}/conf/httpd.conf -d ${target} -DENVIRONMENT_"${DEFINE_ENV}" -t ${DUMP_CONFIG_INFO}
+    APACHE_PREFIX=${target} su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${target} -f ${target}/conf/httpd.conf -d ${target} ${ARGS} -t ${DUMP_CONFIG_INFO}
     if [ $? -ne 0 ]
     then 
         echo " "
@@ -193,7 +196,11 @@ function test_configuration {
         set -e
         return 1
     fi
-    
+
+    if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+      /usr/sbin/managed-rewrite-maps-empty-remove
+    fi
+
     # only dump on the first time, more than that gets annoying.
     DUMP_CONFIG_INFO=""
 

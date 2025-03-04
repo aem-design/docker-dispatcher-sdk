@@ -47,7 +47,7 @@ call !dirname!docker_immutability_check.cmd %folder% extract
 rem Verify docker file is available
 set repo=adobe
 set image=aem-cs/dispatcher-publish
-set version=2.0.169
+set version=2.0.235
 set "imageurl=%repo%/%image%:%version%"
 
 for /F "tokens=* USEBACKQ" %%f in (`docker images -q %imageurl%`) do (

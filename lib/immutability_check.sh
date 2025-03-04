@@ -22,6 +22,10 @@ error() {
     exit 2
 }
 
+warn() {
+    echo >&2 "** warning: $1"
+}
+
 [ $# -eq 2 ] || [ $# -eq 3 ] || usage
 
 listFile=$1
@@ -44,6 +48,7 @@ fi
 echo "running in '${mode}' mode"
 
 expectedConfigFolder="/etc/httpd"
+immutableFilesChanges=0
 
 [ -f "$listFile" ] || error "immutable file list not found: ${listFile}"
 [ -d "$expectedConfigFolder" ] || error "original config folder not found: ${expectedConfigFolder}"
@@ -86,7 +91,8 @@ do
             diff -b -q "${expectedConfigFolder}"/"${file}" "${actualConfigFolder}"/"${file}" > /dev/null || {
                 echo "immutable file '${file}' has been changed:"
                 diff "${expectedConfigFolder}"/"${file}" "${actualConfigFolder}"/"${file}"
-                error "immutable file '${file}' has been changed!"
+                warn "immutable file '${file}' has been changed!"
+                immutableFilesChanges=$(( immutableFilesChanges + 1 ))
             }
         else
             echo "force-copying '${file} into config directory (creating parent dirs if not present)"
@@ -101,7 +107,12 @@ do
 done
 
 if [ "$mode" == "check" ]; then
-    echo "no immutable file has been changed - check is SUCCESSFUL"
+    [ ${immutableFilesChanges} -ne 0 ] && {
+        error "${immutableFilesChanges} immutable files changed";
+    } || {
+        echo "no immutable file has been changed - check is SUCCESSFUL";
+        exit 0;
+    }
 else
     echo "immutable files extraction COMPLETE"
 fi

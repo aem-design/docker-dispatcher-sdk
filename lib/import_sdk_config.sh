@@ -15,12 +15,10 @@ else
   build_configuration "${RUNNING_BASE}"
   # As new docroots could have been introduced by the client configuration
   # they have to be created again.
-  echo "Running /docker_entrypoint.d/20-create-docroots.sh"
   APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/20-create-docroots.sh
-  echo "Running /docker_entrypoint.d/40-generate-allowed-clients.sh"
   APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/40-generate-allowed-clients.sh
-  if [[ -z "$SKIP_CONFIG_TESTING" ]]; then
-    echo "Running test_configuration"
+  if [ "$SKIP_CONFIG_TESTING" != "true" ]; then
     test_configuration "${RUNNING_BASE}" "${CUSTOMER_CONF}"
   fi
+  APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/35-update-managed-rewrite-maps.sh
 fi

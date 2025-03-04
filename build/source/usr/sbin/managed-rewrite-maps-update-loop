@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+#
+# Specify default managed rewrite maps update sleep time if none is set
+#
+if [ -z "${MANAGED_REWRITE_MAPS_SLEEP_TIME_SECS}" ]; then
+  MANAGED_REWRITE_MAPS_SLEEP_TIME_SECS=30
+else
+  echo "Detected managed rewrite maps update sleep time: ${MANAGED_REWRITE_MAPS_SLEEP_TIME_SECS} seconds"
+fi
+
+source /docker_entrypoint.d/35-update-managed-rewrite-maps.sh || true
+
+debug_msg "Starting monitoring of managed rewrite maps changes"
+while true; do
+    debug_msg "Waiting for ${MANAGED_REWRITE_MAPS_SLEEP_TIME_SECS} seconds for next managed rewrite maps check"
+    sleep ${MANAGED_REWRITE_MAPS_SLEEP_TIME_SECS}
+    source /docker_entrypoint.d/35-update-managed-rewrite-maps.sh || true
+done

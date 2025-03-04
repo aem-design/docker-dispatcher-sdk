@@ -32,7 +32,7 @@ ENV APACHE_PREFIX="${APACHE_PREFIX}" \
     USER_DATA_DIR="${USER_DATA_DIR}"
 
 # inslall apache
-RUN   apk --no-cache add apache2 apache2-proxy apache2-ssl apache2-utils curl ed libxml2 inotify-tools su-exec bash unzip && \
+RUN   apk --no-cache add apache2 apache2-proxy apache2-ssl apache2-utils pcre2 curl ed libxml2 inotify-tools su-exec bash unzip jq yq coreutils && \
       mkdir -p ${APACHE_PREFIX} && \
       mkdir -p ${APACHE_RUN_DIR} && \
       mkdir -p ${APACHE_DOCROOT} && \

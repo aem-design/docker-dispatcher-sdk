@@ -21,5 +21,23 @@ done
 echo "${AEM_HOST} resolves to ${AEM_IP}"
 export AEM_IP
 
+if [ "${SKIP_BACKEND_WAIT}" = "true" ]; then
+  echo "Waiting until port ${AEM_PORT} on ${AEM_HOST} skipped due to SKIP_BACKEND_WAIT variable set"
+else
+  portTimeoutSeconds=1
+  portSleepSeconds=5
+  echo "Waiting until port ${AEM_PORT} on ${AEM_HOST} is available (with timeout of ${portTimeoutSeconds}s)"
+  while [ true ]; do
+    nc -z -w $portTimeoutSeconds "${AEM_HOST}" "${AEM_PORT}"
+    ncExitStatus=$?
+    if [ $ncExitStatus -eq 0 ]; then
+      break;
+    fi
+    echo "Sleeping for ${portSleepSeconds}s to wait until port ${AEM_PORT} on ${AEM_HOST} is available"
+    sleep $portSleepSeconds
+  done
+  echo "Port ${AEM_PORT} on ${AEM_HOST} is available"
+fi
+
 echo "${AEM_HOST}" > /tmp/aem_host
 echo "${AEM_IP}" > /tmp/aem_ip

@@ -1,0 +1,53 @@
+#!/bin/sh
+
+#
+# Create empty managed rewrite maps - required for testing dispatcher config referring to those maps without AEM backend e.g. httpd -t
+#
+# param1: <HTTPD config dir> e.g. /etc/httpd or custom (e.g. for testing scenarios)
+
+MANAGED_REWRITE_MAPS_DESCRIPTOR="${1}/opt-in/managed-rewrite-maps.yaml"
+TEMP_DIR=/tmp
+REWRITE_MAP_DIR=${TEMP_DIR}/rewrites
+
+as_apache() {
+  su-exec "${APACHE_USER}:${APACHE_GROUP}" $*
+}
+
+generate_map_file() {
+  echo "using empty file '${TEMP_FILE}' for '${name}' empty map"
+  ls -al "${TEMP_FILE}"
+  as_apache httxt2dbm -i ${TEMP_FILE} -o ${TEMP_DIR}/${name} -f SDBM
+  as_apache mv -v ${TEMP_DIR}/${name}.* ${REWRITE_MAP_DIR}
+  echo "generated empty map under '${REWRITE_MAP_DIR}' for '${name}' map"
+  ls -al "${REWRITE_MAP_DIR}/${name}".*
+  as_apache rm ${TEMP_FILE}
+  echo "empty map configured in '${REWRITE_MAP_DIR}/${name}.*' files"
+}
+
+create_empty_map() {
+  TEMP_FILE=$(as_apache mktemp)
+  chmod 644 "${TEMP_FILE}"
+  generate_map_file
+}
+
+create_empty_maps() {
+  as_apache mkdir -p "${REWRITE_MAP_DIR}"
+  yq -o=json '.maps[]' < "$MANAGED_REWRITE_MAPS_DESCRIPTOR" \
+  | jq -r -c  '. | [.name] | @tsv' \
+  | while read -r name; do
+    echo "creating empty map '$name'"
+    create_empty_map
+  done
+  
+}
+
+if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+  echo "Creating empty managed rewrite maps configured in '${MANAGED_REWRITE_MAPS_DESCRIPTOR}' for testing purposes"
+  if [ -f ${MANAGED_REWRITE_MAPS_DESCRIPTOR} ]; then
+    echo "Managed rewrite maps configured in '${MANAGED_REWRITE_MAPS_DESCRIPTOR}'"
+    create_empty_maps || true
+    ls -al "${REWRITE_MAP_DIR}"
+  else
+    echo "No managed rewrite maps configured"
+  fi
+fi

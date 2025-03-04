@@ -36,6 +36,13 @@
 <h2 id="quick-walkthrough-of-local-development-and-testing">Quick walkthrough of local development and testing</h2>
 <p>The following three validation steps are newly wrapped in the <code>validate.sh</code> script as phases 1-3.</p>
 <pre><code>$ ./bin/validate.sh src</code></pre>
+<h3 id="validate.sh-and-validate.cmd-scripts-changes">validate.sh and validate.cmd scripts changes</h3>
+<p>The validate.sh (*nix) / validate.cmd (Windows) will now prompt the user to update the immutable files during the phase 3, if they got changed. The default behavior is to prompt whether the user wants to update or not the immutable files. It is highly recommended to accept the prompt in order to keep the immutable files in line with the configuration provided by Adobe.</p>
+<p>This behavior can be disabled by setting the environment variable:</p>
+<pre><code>$ IMMUTABLE_FILES_UPDATE=false ./bin/validate.sh src</code></pre>
+<p>On Windows, type:</p>
+<pre><code>$ set IMMUTABLE_FILES_UPDATE=false
+$ bin\validate.cmd src</code></pre>
 <h3 id="step-1-validate-the-dispatcher-configuration-contained-in-this-sdk">Step 1: Validate the Dispatcher configuration contained in this SDK</h3>
 <pre><code>$ ./bin/validator full -d out src</code></pre>
 <p>On Windows, type:</p>

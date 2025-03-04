@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#
+# Remove empty managed rewrite maps - required to tear down after testing dispatcher config referring to those maps without AEM backend e.g. httpd -t
+#
+
+TEMP_DIR=/tmp
+REWRITE_MAP_DIR=${TEMP_DIR}/rewrites
+
+as_apache() {
+  su-exec "${APACHE_USER}:${APACHE_GROUP}" $*
+}
+
+remove_empty_maps() {
+  if [ -d "${REWRITE_MAP_DIR}" ]; then
+    as_apache find "${REWRITE_MAP_DIR}" -type f -empty -delete
+  fi
+}
+
+if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+  echo "Removing empty managed rewrite maps files for testing purposes"
+  remove_empty_maps || true
+fi

@@ -1,0 +1,72 @@
+set -e
+
+# Pick up any necessary environment variables
+if [ -f /usr/sbin/envvars ]; then
+  . /usr/sbin/envvars
+fi
+
+# Pass the environment type as define
+DEFINE_ENV=$(echo $ENVIRONMENT_TYPE | tr [:lower:] [:upper:])
+ARGS="-DENVIRONMENT_${DEFINE_ENV}"
+
+cleanup_arguments() {
+  if [ -n "${ENABLE_X_REQUEST_ID_LOGGING}" ]; then
+    echo "Enabling X-Request-Id header logging due to forwarded host mode setting"
+    ARGS="${ARGS} -DLOG_X_REQUEST_ID"
+  fi
+
+  if [ -n "${COMMERCE_ENDPOINT}" ]; then
+    if [[ "$COMMERCE_ENDPOINT" == *" "* ]]; then
+      echo "White spaces detected in COMMERCE_ENDPOINT='${COMMERCE_ENDPOINT}'"
+      COMMERCE_ENDPOINT="$(echo -e "${COMMERCE_ENDPOINT}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    fi
+    echo "Enabling reverse-proxy for Commerce - COMMERCE_ENDPOINT='${COMMERCE_ENDPOINT}'"
+    ARGS="${ARGS} -DCOMMERCE"
+  fi
+
+  if [ -n "${AEM_COMMERCE_ENDPOINT_2}" ]; then
+    if [[ "$AEM_COMMERCE_ENDPOINT_2" == *" "* ]]; then
+      echo "White spaces detected in AEM_COMMERCE_ENDPOINT_2='${AEM_COMMERCE_ENDPOINT_2}'"
+      AEM_COMMERCE_ENDPOINT_2="$(echo -e "${AEM_COMMERCE_ENDPOINT_2}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    fi
+    echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_2='${AEM_COMMERCE_ENDPOINT_2}'"
+    ARGS="${ARGS} -DCOMMERCE_ENDPOINT_2"
+  fi
+
+  if [ -n "${AEM_COMMERCE_ENDPOINT_3}" ]; then
+    if [[ "$AEM_COMMERCE_ENDPOINT_3" == *" "* ]]; then
+      echo "White spaces detected in AEM_COMMERCE_ENDPOINT_3='${AEM_COMMERCE_ENDPOINT_3}'"
+      AEM_COMMERCE_ENDPOINT_3="$(echo -e "${AEM_COMMERCE_ENDPOINT_3}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    fi
+    echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_3='${AEM_COMMERCE_ENDPOINT_3}'"
+    ARGS="${ARGS} -DCOMMERCE_ENDPOINT_3"
+  fi
+
+  if [ -n "${AEM_COMMERCE_ENDPOINT_4}" ]; then
+    if [[ "$AEM_COMMERCE_ENDPOINT_4" == *" "* ]]; then
+      echo "White spaces detected in AEM_COMMERCE_ENDPOINT_4='${AEM_COMMERCE_ENDPOINT_4}'"
+      AEM_COMMERCE_ENDPOINT_4="$(echo -e "${AEM_COMMERCE_ENDPOINT_4}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    fi
+    echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_4='${AEM_COMMERCE_ENDPOINT_4}'"ƒ
+    ARGS="${ARGS} -DCOMMERCE_ENDPOINT_4"
+  fi
+
+  if [ -n "${AEM_COMMERCE_ENDPOINT_5}" ]; then
+    if [[ "$AEM_COMMERCE_ENDPOINT_5" == *" "* ]]; then
+      echo "White spaces detected in AEM_COMMERCE_ENDPOINT_5='${AEM_COMMERCE_ENDPOINT_5}'"
+      AEM_COMMERCE_ENDPOINT_5="$(echo -e "${AEM_COMMERCE_ENDPOINT_5}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    fi
+    echo "Enabling reverse-proxy for Commerce - AEM_COMMERCE_ENDPOINT_5='${AEM_COMMERCE_ENDPOINT_5}'"
+    ARGS="${ARGS} -DCOMMERCE_ENDPOINT_5"
+  fi
+
+  if [ -n "${AEM_HTTP_PROXY_HOST}" ]; then
+    echo "Enabling HTTP egress proxy - AEM_HTTP_PROXY_HOST=${AEM_HTTP_PROXY_HOST}"
+    ARGS="${ARGS} -DHTTP_EGRESS_PROXY"
+  fi
+
+  if [ -n "${FRONTEND_URI_PREFIX}" ]; then
+    echo "Enabling fronted support"
+    ARGS="${ARGS} -DFRONTEND_SUPPORT"
+  fi
+}

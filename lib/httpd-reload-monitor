@@ -40,6 +40,7 @@ while inotifywait -r -e modify -e create -e delete --format "Monitor: %e %w" ${C
 			# As new docroots could have been introduced by the client configuration
 			# they have to be created again.
 			APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/20-create-docroots.sh
+			APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/35-update-managed-rewrite-maps.sh
 			APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/40-generate-allowed-clients.sh
 			if [ -f "/docker_entrypoint.d/zzz-overwrite_cache_invalidation.sh" ]; then
 				APACHE_PREFIX="${RUNNING_BASE}" . /docker_entrypoint.d/zzz-overwrite_cache_invalidation.sh

@@ -1,12 +1,11 @@
 #!/bin/sh
 set -e
+source httpd-arguments
 
-# Pick up any necessary environment variables
-if [ -f /usr/sbin/envvars ]; then
-  . /usr/sbin/envvars
+cleanup_arguments
+
+if [ "$ENABLE_MANAGED_REWRITE_MAPS_FLAG" = "true" ]; then
+  /usr/sbin/managed-rewrite-maps-empty-init "${APACHE_PREFIX}"
 fi
 
-# Pass the environment type as define
-DEFINE_ENV=`echo $ENVIRONMENT_TYPE | tr [:lower:] [:upper:]`
-
-exec su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${APACHE_PREFIX} -f ${APACHE_PREFIX}/conf/httpd.conf -DENVIRONMENT_${DEFINE_ENV} -t -D DUMP_RUN_CFG -D DUMP_ANY
+exec su-exec "${APACHE_USER}:${APACHE_GROUP}" httpd -d ${APACHE_PREFIX} -f ${APACHE_PREFIX}/conf/httpd.conf ${ARGS} -t -D DUMP_RUN_CFG -D DUMP_ANY
