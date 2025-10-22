@@ -1,7 +1,7 @@
 version: "3"
 services:
   dispatcher:
-    build: .
+    image: ${IMAGE_NAME:-aemdesign/dispatcher-sdk}
     container_name: test_dispatcher
     environment:
       - AEM_PORT=80

@@ -9,7 +9,7 @@
 export RENDERER_PORT=8081
 export DISPATCHER_PORT=8080
 export DISPATCHER_LOGLEVEL=1
-IMAGE_NAME=${1:-aemdesign/dispatcher-sdk}
+export IMAGE_NAME=${1:-aemdesign/dispatcher-sdk}
 FLAG_DEBUG=${2:-true}
 IP=$(which ip)
 if [[ -z $IP ]]; then
@@ -112,14 +112,14 @@ printSection() {
 
 setup() {
 	printLine "Starting Container"
-  docker-compose up -d --force-recreate --build
+  docker-compose up -d --force-recreate
 }
 
 showlog() {
-  printSection "Dispatcher Author Log"
-  docker logs test_dispatcher_author
-  printSection "Dispatcher Publish Log"
-  docker logs test_dispatcher_publish
+  printSection "Dispatcher Log"
+  docker logs test_dispatcher
+  printSection "Renderer Log"
+  docker logs test_dispatcher_renderer
 }
 
 teardown() {
