@@ -155,8 +155,12 @@ printLine "TEST CONFIGS"
 # Setup containers
 setup
 
+printLine "Waiting for containers to be ready..."
+sleep 10
+
 docker ps
 
+printLine "Testing dispatcher endpoint..."
 curl "http://0.0.0.0:${DISPATCHER_PORT}/"
 
 test_docker_run_usage ${DISPATCHER_PORT}
