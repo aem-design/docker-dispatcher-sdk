@@ -51,29 +51,29 @@ The project uses GitHub Actions for continuous integration and deployment:
 
 The `get-action-logs.ps1` PowerShell script provides easy access to GitHub Actions workflow status and logs.
 
+#### Prerequisites
+
+- GitHub CLI (`gh`) must be installed and authenticated
+- Install: `winget install --id GitHub.cli`
+- Authenticate: `gh auth login`
+
 #### Quick Start
 
 ```powershell
 # Check current commit's pipeline status (saves logs to logs/ folder by default)
 .\get-action-logs.ps1
 
-# Show logs in console
-.\get-action-logs.ps1 -ShowLogs
-
-# Show and save logs
-.\get-action-logs.ps1 -ShowLogs
-
-# Disable saving logs
-.\get-action-logs.ps1 -SaveLogs:$false
-
 # Wait for pipeline to complete
 .\get-action-logs.ps1 -WaitForCompletion
 
-# Wait for completion and show logs
-.\get-action-logs.ps1 -WaitForCompletion -ShowLogs
+# Show logs in console
+.\get-action-logs.ps1 -ShowLogs
+
+# Force re-download logs
+.\get-action-logs.ps1 -Force
 ```
 
-#### Additional Options
+#### Advanced Options
 
 ```powershell
 # View specific run's logs
@@ -93,6 +93,9 @@ The `get-action-logs.ps1` PowerShell script provides easy access to GitHub Actio
 
 # Filter by workflow
 .\get-action-logs.ps1 -Workflow "build.yml"
+
+# Disable auto-save
+.\get-action-logs.ps1 -SaveLogs:$false
 ```
 
 #### Saved Logs
@@ -103,9 +106,11 @@ Logs are automatically saved to the `logs/` folder with the following naming con
 logs/run-{runId}-{commitSha}-{workflowName}-{conclusion}.log
 ```
 
-Example: `run-18705686914-38efdc2-build-failure.log`
+Example: `logs/run-18709640324-780320e-build-success.log`
 
 **Note**: The script automatically detects if logs have already been downloaded and skips re-downloading them. Use `-Force` to re-download existing logs.
+
+See full script documentation: `Get-Help .\get-action-logs.ps1 -Full`
 
 ### Creating a New Release
 
