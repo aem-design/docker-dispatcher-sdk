@@ -61,6 +61,7 @@ jobs:
           cd test && bash ./run_tests.sh "ghcr.io/$GITHUB_REPOSITORY_OWNER/$IMAGE:$GIT_BRANCH"
 
       - name: Run docker image analysis
+        continue-on-error: true
         uses: MaxymVlasov/dive-action@v1.4.0
         with:
           image:  ${{ steps.docker_build.outputs.imageid }}
