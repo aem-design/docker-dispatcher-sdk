@@ -112,7 +112,7 @@ printSection() {
 
 setup() {
 	printLine "Starting Container"
-  docker-compose up -d --force-recreate
+  docker compose up -d --force-recreate
 }
 
 showlog() {
@@ -124,7 +124,7 @@ showlog() {
 
 teardown() {
 	printLine "Remove Test containers"
-	docker-compose down
+	docker compose down
 }
 
 test_docker_run_usage() {
