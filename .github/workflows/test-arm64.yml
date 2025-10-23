@@ -63,17 +63,27 @@ jobs:
           export IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/aemdesign${{ env.IMAGE }}:${{ env.GIT_BRANCH }}"
           # ARM64 emulation needs more time to start
           cd test
+          # Set platform for docker compose to use ARM64 images
+          export DOCKER_DEFAULT_PLATFORM=linux/arm64
           # Start containers
           docker compose up -d --force-recreate
           # Wait longer for ARM64 emulation
           echo "Waiting 30 seconds for emulated ARM64 containers to be ready..."
           sleep 30
-          # Now run the actual tests (skip setup since we already started containers)
-          docker ps
+          # Check container status
+          echo "Container status:"
+          docker ps -a
+          # Show logs if dispatcher exited
+          if ! docker ps | grep -q test_dispatcher; then
+            echo "Dispatcher container not running! Showing logs:"
+            docker logs test_dispatcher || true
+            docker logs test_dispatcher_renderer || true
+            exit 1
+          fi
           echo "Testing dispatcher endpoint..."
           curl "http://0.0.0.0:8080/"
           # Run the test without setup/teardown
-          docker run --rm ghcr.io/${{ github.repository_owner }}/aemdesign${{ env.IMAGE }}:${{ env.GIT_BRANCH }} httpd -v
+          docker run --rm --platform linux/arm64 ghcr.io/${{ github.repository_owner }}/aemdesign${{ env.IMAGE }}:${{ env.GIT_BRANCH }} httpd -v
           # Teardown
           docker compose down
 
