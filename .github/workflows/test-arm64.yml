@@ -26,10 +26,6 @@ jobs:
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
           echo "Image: $IMAGE"
           echo "Branch: $GIT_BRANCH"
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-          echo "Image: $IMAGE"
-          echo "Branch: $GIT_BRANCH"
 
       - name: Set up QEMU for ARM64 emulation
         uses: docker/setup-qemu-action@v2
@@ -55,16 +51,16 @@ jobs:
       - name: Pull ARM64 image
         run: |
           echo "Pulling arm64 image..."
-          docker pull --platform linux/arm64 ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH
-
+          docker pull --platform linux/arm64 ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}:${{ env.GIT_BRANCH }}
+          
           echo "Inspecting image..."
-          docker inspect ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH --format='Architecture: {{.Architecture}}'
+          docker inspect ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}:${{ env.GIT_BRANCH }} --format='Architecture: {{.Architecture}}'
           docker images | grep dispatcher-sdk
 
       - name: Test ARM64 image via QEMU
         run: |
           echo "Testing ARM64 image with QEMU user-mode emulation..."
-          export IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH"
+          export IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}:${{ env.GIT_BRANCH }}"
           cd test && bash ./run_tests.sh "$IMAGE_NAME"
 
       - name: Show logs on failure
