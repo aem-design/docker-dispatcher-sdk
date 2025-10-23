@@ -72,8 +72,10 @@ jobs:
           # Check container status
           echo "Container status:"
           docker ps -a
-          # Show logs if dispatcher exited (check if running, not just if name exists)
-          if ! docker ps --filter "name=test_dispatcher" --filter "status=running" --format "{{.Names}}" | grep -q test_dispatcher; then
+          # Show logs if dispatcher exited - check container status directly
+          DISPATCHER_STATUS=$(docker ps -a --filter "name=test_dispatcher" --format "{{.Status}}")
+          echo "Dispatcher status: $DISPATCHER_STATUS"
+          if [[ ! "$DISPATCHER_STATUS" =~ "Up" ]]; then
             echo ""
             echo "=========================================="
             echo "DISPATCHER CONTAINER NOT RUNNING!"
