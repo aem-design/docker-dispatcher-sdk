@@ -42,10 +42,17 @@ docker run -d --rm -v ${PWD}/src:/mnt/dev/src -p 8080:80 -e AEM_PORT=4503 -e AEM
 The project uses GitHub Actions for continuous integration and deployment:
 
 - **Multi-platform builds**: Images are built for both `linux/amd64` and `linux/arm64`
-- **Automated testing**: Each build is tested before pushing
+- **Automated testing**: 
+  - Linux testing on `ubuntu-latest` with amd64 image
+  - macOS testing on `macos-14` (Apple Silicon) with arm64 image
 - **Image analysis**: Uses `dive` for Docker image layer analysis
 - **Dual registry push**: Automatically pushes to Docker Hub and GitHub Container Registry
 - **Git tag versioning**: Pushing a git tag (e.g., `2.0.188`) automatically creates a corresponding Docker image tag
+
+#### Pipeline Jobs
+
+1. **build** (Linux): Builds, tests, and pushes multi-arch images
+2. **test-macos** (Apple Silicon): Validates arm64 image on macOS
 
 ### Monitoring Pipeline Status
 

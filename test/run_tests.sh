@@ -11,14 +11,29 @@ export DISPATCHER_PORT=8080
 export DISPATCHER_LOGLEVEL=1
 export IMAGE_NAME=${1:-aemdesign/dispatcher-sdk}
 FLAG_DEBUG=${2:-true}
-IP=$(which ip)
-if [[ -z $IP ]]; then
+
+# Detect OS and set appropriate local IP
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    LOCAL_IP="host.docker.internal"
+    OS_TYPE="macOS"
+elif [[ -f /etc/alpine-release ]]; then
+    # Alpine Linux
     LOCAL_IP="localhost"
+    OS_TYPE="Alpine Linux"
 else
-    LOCAL_IP=$($IP route | awk '/default/ { print $3 }')
+    # Linux with ip command
+    IP=$(which ip)
+    if [[ -z $IP ]]; then
+        LOCAL_IP="localhost"
+    else
+        LOCAL_IP=$($IP route | awk '/default/ { print $3 }')
+    fi
+    OS_TYPE="Linux"
 fi
 
 echo "Testing image ${IMAGE_NAME} ..."
+echo "Operating System: ${OS_TYPE}"
 echo "Local IP: ${LOCAL_IP}"
 echo "Renderer Port: ${RENDERER_PORT}"
 echo "Dispatcher Port: ${DISPATCHER_PORT}"
