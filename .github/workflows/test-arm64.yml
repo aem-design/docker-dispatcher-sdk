@@ -63,8 +63,7 @@ jobs:
           export IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/aemdesign${{ env.IMAGE }}:${{ env.GIT_BRANCH }}"
           # ARM64 emulation needs more time to start
           cd test
-          # Set platform for docker compose to use ARM64 images
-          export DOCKER_DEFAULT_PLATFORM=linux/arm64
+          # Note: nginx uses amd64, dispatcher uses arm64 (via IMAGE_NAME)
           # Start containers
           docker compose up -d --force-recreate
           # Wait longer for ARM64 emulation
