@@ -44,15 +44,19 @@ The project uses GitHub Actions for continuous integration and deployment:
 - **Multi-platform builds**: Images are built for both `linux/amd64` and `linux/arm64`
 - **Automated testing**: 
   - Linux testing on `ubuntu-latest` with amd64 image
-  - macOS testing on `macos-14` (Apple Silicon) with arm64 image
+  - ARM64 testing via QEMU emulation on `ubuntu-latest`
 - **Image analysis**: Uses `dive` for Docker image layer analysis
 - **Dual registry push**: Automatically pushes to Docker Hub and GitHub Container Registry
 - **Git tag versioning**: Pushing a git tag (e.g., `2.0.188`) automatically creates a corresponding Docker image tag
 
 #### Pipeline Jobs
 
-1. **build** (Linux): Builds, tests, and pushes multi-arch images
-2. **test-macos** (Apple Silicon): Validates arm64 image on macOS
+1. **build** (Linux): Builds, tests, and pushes multi-arch images (amd64/arm64)
+2. **test-arm64** (QEMU Emulation): Validates arm64 image functionality
+
+#### ARM64 Known Limitations
+
+- **mod_qos disabled**: The `mod_qos` (Quality of Service) Apache module is automatically disabled on ARM64 builds due to binary incompatibility. All other functionality remains intact.
 
 ### Monitoring Pipeline Status
 

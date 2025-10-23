@@ -42,6 +42,16 @@ RUN   apk --no-cache add apache2 apache2-proxy apache2-ssl apache2-utils pcre2 c
 # copy initial content
 COPY  build/source /
 
+# disable mod_qos for ARM64 (binary compatibility issue)
+RUN   ARCH=$(uname -m) && \
+      if [ "$ARCH" = "aarch64" ]; then \
+        echo "ARM64 detected - removing mod_qos (unsupported relocation type)"; \
+        rm -f /usr/lib/apache2/mod_qos.so; \
+        rm -f ${APACHE_PREFIX}/conf.modules.d/00-qos.conf; \
+      else \
+        echo "AMD64 detected - keeping mod_qos"; \
+      fi
+
 # add symlinks for logs, modules and run
 RUN   cd ${APACHE_PREFIX} && \
       ln -s ${APACHE_SERVER_ROOT}/logs .  && \

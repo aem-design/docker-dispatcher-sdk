@@ -1,12 +1,11 @@
 name: build
 
 on:
-  # Temporarily disabled for testing - will re-enable after ARM64 workflow is working
-  # push:
-  #   branches:
-  #     - '*'
-  #   tags:
-  #     - '*'
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
