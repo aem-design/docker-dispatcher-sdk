@@ -26,6 +26,10 @@ jobs:
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
           echo "Image: $IMAGE"
           echo "Branch: $GIT_BRANCH"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+          echo "Image: $IMAGE"
+          echo "Branch: $GIT_BRANCH"
 
       - name: Set up QEMU for ARM64 emulation
         uses: docker/setup-qemu-action@v2
