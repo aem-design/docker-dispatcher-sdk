@@ -119,6 +119,8 @@ jobs:
 
           body: ${{ env.GIT_RELEASE_NOTES }}
 
+          body: ${{ env.GIT_RELEASE_NOTES }}
+
             TAGS="${IMAGE}:${GIT_BRANCH}"
             TAGS="${TAGS},ghcr.io/${GITHUB_REPOSITORY_OWNER}/${IMAGE}:${GIT_BRANCH}"
             if [ "${{ github.ref }}" = "refs/heads/main" ]; then
