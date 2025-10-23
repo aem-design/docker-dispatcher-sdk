@@ -19,6 +19,7 @@ jobs:
 
 
     steps:
+      - uses: actions/checkout@v2
 
       - uses: actions/checkout@v2
       - name: set envirnment variables
@@ -121,7 +122,14 @@ jobs:
     runs-on: macos-14
     
     steps:
-      - uses: actions/checkout@v2
+
+      
+      - name: Install and start Colima (Docker runtime)
+        run: |
+          brew install docker colima
+          colima start --arch aarch64 --vm-type=vz --vz-rosetta --mount-type=virtiofs
+          docker --version
+          docker info
       
       - name: Set environment variables
         id: config
@@ -165,3 +173,5 @@ jobs:
           echo "=== Docker Logs ==="
           docker ps -a
           docker compose -f test/docker-compose.yml logs || true
+
+
