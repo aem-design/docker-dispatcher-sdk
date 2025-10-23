@@ -1,0 +1,68 @@
+name: test-arm64
+
+on:
+  workflow_run:
+    workflows: ["build"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-arm64-emulated:
+    name: Test ARM64 (QEMU Emulation)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set environment variables
+        id: config
+        run: |
+          source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_get_config.sh)
+          source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_get_version.sh)
+
+      - name: Set up QEMU for ARM64 emulation
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify QEMU ARM64 support
+        run: |
+          echo "Checking QEMU binfmt support..."
+          docker run --rm --platform linux/arm64 arm64v8/alpine uname -m
+          echo "ARM64 emulation working!"
+
+      - name: Pull ARM64 image
+        run: |
+          echo "Pulling arm64 image..."
+          docker pull --platform linux/arm64 ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH
+
+          echo "Inspecting image..."
+          docker inspect ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH --format='Architecture: {{.Architecture}}'
+          docker images | grep dispatcher-sdk
+
+      - name: Test ARM64 image via QEMU
+        run: |
+          echo "Testing ARM64 image with QEMU user-mode emulation..."
+          export IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$IMAGE:$GIT_BRANCH"
+          cd test && bash ./run_tests.sh "$IMAGE_NAME"
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "=== Docker Logs ==="
+          docker ps -a
+          docker compose -f test/docker-compose.yml logs || true
+
