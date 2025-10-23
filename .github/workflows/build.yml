@@ -127,7 +127,7 @@ jobs:
       - name: Install and start Colima (Docker runtime)
         run: |
           brew install docker colima
-          colima start --arch aarch64 --vm-type=vz --mount-type=virtiofs
+          colima start --cpu 2 --memory 4 --disk 60
           docker --version
           docker info
       
