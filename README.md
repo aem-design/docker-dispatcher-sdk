@@ -56,7 +56,11 @@ The project uses GitHub Actions for continuous integration and deployment:
 
 #### ARM64 Known Limitations
 
-- **mod_qos disabled**: The `mod_qos` (Quality of Service) Apache module is automatically disabled on ARM64 builds due to binary incompatibility. All other functionality remains intact.
+- **Incompatible Apache modules disabled**: The following Apache modules are automatically disabled on ARM64 builds due to binary incompatibility:
+  - `mod_qos` (Quality of Service) - unsupported relocation type 1
+  - `mod_security2` (ModSecurity WAF) - unsupported relocation type 7
+  
+  All other functionality remains intact. These modules are compiled for x86_64 and require ARM64-specific builds.
 
 ### Monitoring Pipeline Status
 
