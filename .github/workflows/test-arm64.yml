@@ -21,7 +21,11 @@ jobs:
         id: config
         run: |
           source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_get_config.sh)
-          source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_get_version.sh)`n          echo "IMAGE=`$IMAGE" >> `$GITHUB_ENV`n          echo "GIT_BRANCH=`$GIT_BRANCH" >> `$GITHUB_ENV`n          echo "Image: `$IMAGE"`n          echo "Branch: `$GIT_BRANCH"
+          source <(curl -sL https://github.com/aem-design/aemdesign-docker/releases/latest/download/github_get_version.sh)
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+          echo "Image: $IMAGE"
+          echo "Branch: $GIT_BRANCH"
 
       - name: Set up QEMU for ARM64 emulation
         uses: docker/setup-qemu-action@v2
