@@ -8,7 +8,7 @@
 [![docker stars](https://img.shields.io/docker/stars/aemdesign/dispatcher-sdk)](https://hub.docker.com/r/aemdesign/dispatcher-sdk)
 [![docker pulls](https://img.shields.io/docker/pulls/aemdesign/dispatcher-sdk)](https://hub.docker.com/r/aemdesign/dispatcher-sdk)
 
-AEM Dispatcher SDK Docker image with multi-architecture support (amd64/arm64).
+AEM Dispatcher SDK Docker image for linux/amd64 (also runs on Apple Silicon via Rosetta 2).
 
 Please go to docs/README.html to find the documentation.
 
@@ -41,26 +41,54 @@ docker run -d --rm -v ${PWD}/src:/mnt/dev/src -p 8080:80 -e AEM_PORT=4503 -e AEM
 
 The project uses GitHub Actions for continuous integration and deployment:
 
-- **Multi-platform builds**: Images are built for both `linux/amd64` and `linux/arm64`
-- **Automated testing**: 
-  - Linux testing on `ubuntu-latest` with amd64 image
-  - ARM64 testing via QEMU emulation on `ubuntu-latest`
+- **Platform**: Images are built for `linux/amd64`
+- **Apple Silicon support**: Works seamlessly on M1/M2/M3/M4 Macs via Docker Desktop's Rosetta 2 emulation
+- **Automated testing**: Validates image on `ubuntu-latest` runner
 - **Image analysis**: Uses `dive` for Docker image layer analysis
 - **Dual registry push**: Automatically pushes to Docker Hub and GitHub Container Registry
 - **Git tag versioning**: Pushing a git tag (e.g., `2.0.188`) automatically creates a corresponding Docker image tag
 
-#### Pipeline Jobs
+#### Why amd64 Only?
 
-1. **build** (Linux): Builds, tests, and pushes multi-arch images (amd64/arm64)
-2. **test-arm64** (QEMU Emulation): Validates arm64 image functionality
+Adobe's `mod_dispatcher.so` module is only available as a compiled x86_64 binary. ARM64 builds are not feasible without ARM64-compiled binaries from Adobe. The amd64 images work on Apple Silicon Macs via Rosetta 2 emulation in Docker Desktop.
 
-#### ARM64 Known Limitations
+### Running on Apple Silicon Macs (M1/M2/M3/M4)
 
-- **Incompatible Apache modules disabled**: The following Apache modules are automatically disabled on ARM64 builds due to binary incompatibility:
-  - `mod_qos` (Quality of Service) - unsupported relocation type 1
-  - `mod_security2` (ModSecurity WAF) - unsupported relocation type 7
-  
-  All other functionality remains intact. These modules are compiled for x86_64 and require ARM64-specific builds.
+This image is built for `linux/amd64` architecture but runs seamlessly on Apple Silicon Macs through **Rosetta 2** emulation in Docker Desktop.
+
+#### Prerequisites
+
+1. **Docker Desktop for Mac** (version 4.25.0 or later recommended)
+   - Download from: https://www.docker.com/products/docker-desktop
+
+2. **Rosetta 2** (usually already installed on modern macOS)
+   - To verify/install: `softwareupdate --install-rosetta`
+
+#### Enable Rosetta 2 in Docker Desktop
+
+1. Open **Docker Desktop**
+2. Go to **Settings** (⚙️ icon) → **General**
+3. Enable **"Use Rosetta for x86_64/amd64 emulation on Apple Silicon"**
+4. Click **Apply & Restart**
+
+![Docker Desktop Rosetta Setting](https://docs.docker.com/desktop/images/rosetta.png)
+
+#### Verify It's Working
+
+```bash
+# Pull and run the dispatcher image
+docker pull aemdesign/dispatcher-sdk:latest
+docker run --rm aemdesign/dispatcher-sdk:latest uname -m
+
+# Expected output: x86_64 (running via Rosetta 2)
+```
+
+#### Performance Notes
+
+- **Rosetta 2 emulation** provides near-native performance for most workloads
+- First container start may be slightly slower (Rosetta translation cache warmup)
+- Subsequent starts are fast
+- **No code changes needed** - everything works transparently
 
 ### Monitoring Pipeline Status
 
